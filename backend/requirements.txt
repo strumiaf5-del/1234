@@ -1,0 +1,35 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+numpy
+scipy
+librosa
+soundfile
+pydub
+# Python 3.13 eliminó el módulo "audioop" de la stdlib (PEP 594) y pydub lo
+# necesita internamente. audioop-lts lo reemplaza con el mismo API.
+audioop-lts>=0.2.2; python_version>="3.13"
+psutil
+pyloudnorm
+websockets
+numba
+python-dotenv
+noisereduce
+
+# IA (Laia) - Gemini
+# Se llama directo a la API REST de Gemini (generativelanguage.googleapis.com)
+# con requests. No hace falta el SDK oficial.
+requests
+
+# Separacion de stems (Demucs)
+# NOTA (migracion Ubuntu / Python 3.13+):
+# El paquete "demucs" original de Meta (facebookresearch) dejo de mantenerse
+# y no instala en pip con Python 3.10+. Usamos "demucs-infer", un fork
+# mantenido, con el mismo API publico (demucs_infer.pretrained.get_model,
+# demucs_infer.apply.apply_model) y compatible con PyTorch 2.x.
+# torch/torchaudio ya no necesitan pinearse a 1.13.1 (eso era por Windows 7 /
+# Python 3.8); en Ubuntu + Python 3.13 se usan las versiones actuales.
+torch>=2.6
+torchaudio>=2.6
+demucs-infer>=4.1.2
