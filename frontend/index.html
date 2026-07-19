@@ -37,9 +37,9 @@
         --lilac: #a080d0; /* AI / accent2 */
 
         /* ── Texto ── */
-        --text: #b0c0b7b9;
-        --muted: #2314ac;
-        --faint: #3b3425;
+        --text: #d7d2c5;
+        --muted: #9d9b8f;
+        --faint: #6f6d63;
 
         /* ── Tipografía ── */
         --mono: "IBM Plex Mono", "Courier New", monospace;
@@ -68,10 +68,11 @@
       }
 
       body {
+        position: relative;
         background:
-          radial-gradient(circle at 15% 10%, rgba(232, 160, 32, 0.16), transparent 18%),
-          radial-gradient(circle at 90% 15%, rgba(57, 224, 90, 0.10), transparent 18%),
-          linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.16)),
+          radial-gradient(circle at 25% 8%, rgba(232, 160, 32, 0.14), transparent 18%),
+          radial-gradient(circle at 90% 15%, rgba(57, 224, 90, 0.08), transparent 18%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.14)),
           var(--bg);
         color: var(--text);
         font-family: var(--sans);
@@ -81,6 +82,30 @@
         overflow: hidden;
         display: flex;
         flex-direction: column;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 30% 20%, rgba(232, 160, 32, 0.08), transparent 26%),
+          radial-gradient(circle at 82% 18%, rgba(57, 224, 90, 0.06), transparent 24%),
+          repeating-linear-gradient(180deg, transparent 0, transparent 34px, rgba(255, 255, 255, 0.02) 34px, rgba(255, 255, 255, 0.02) 35px);
+        opacity: 0.22;
+        z-index: 0;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 40% 20%, rgba(232, 160, 32, 0.065), transparent 30%),
+          radial-gradient(circle at 80% 13%, rgba(57, 224, 90, 0.05), transparent 24%),
+          repeating-linear-gradient(180deg, transparent 0, transparent 34px, rgba(255, 255, 255, 0.03) 34px, rgba(255, 255, 255, 0.03) 35px);
+        opacity: 0.28;
+        z-index: 0;
       }
 
       /* ═══════════════════════════════════════════════════════════
@@ -1946,47 +1971,48 @@
       .preview-wrap {
         display: grid;
         gap: 1rem;
-        background: linear-gradient(180deg, rgba(232, 160, 32, 0.02), rgba(28, 25, 19, 0.96));
-        border: 1px solid rgba(232, 160, 32, 0.24);
-        border-radius: 18px;
-        padding: 1rem;
-        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.25), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+        background: radial-gradient(circle at 10% 10%, rgba(232, 160, 32, 0.05), transparent 22%),
+          linear-gradient(180deg, rgba(18, 16, 12, 0.92), rgba(24, 22, 18, 0.98));
+        border: 1px solid rgba(232, 160, 32, 0.16);
+        border-radius: 20px;
+        padding: 1.1rem;
+        box-shadow: 0 32px 90px rgba(0, 0, 0, 0.28), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
         position: relative;
         overflow: hidden;
       }
       .preview-wrap::before {
         content: "";
         position: absolute;
-        top: -25%;
-        right: -10%;
+        top: -26%;
+        right: -14%;
         width: 260px;
         height: 260px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(232, 160, 32, 0.18), transparent 55%);
+        background: radial-gradient(circle, rgba(232, 160, 32, 0.12), transparent 50%);
+        filter: blur(8px);
         pointer-events: none;
       }
       .preview-wrap::after {
         content: "";
         position: absolute;
-        bottom: -20px;
-        left: 40px;
-        width: 200px;
-        height: 100px;
-        background: linear-gradient(120deg, transparent 0%, rgba(57, 224, 90, 0.08) 55%, transparent 100%);
-        filter: blur(18px);
+        bottom: -18px;
+        left: 28px;
+        width: 240px;
+        height: 110px;
+        background: linear-gradient(130deg, transparent 0%, rgba(57, 224, 90, 0.07) 50%, transparent 100%);
+        filter: blur(14px);
         pointer-events: none;
       }
       .preview-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 1fr auto;
         gap: 0.85rem;
-        flex-wrap: wrap;
+        align-items: center;
         position: relative;
         z-index: 1;
       }
       .preview-wrap h3 {
-        font-size: 0.88rem;
+        font-size: 0.92rem;
         font-family: var(--mono);
         letter-spacing: 0.18em;
         color: var(--amber);
@@ -2013,44 +2039,62 @@
         gap: 0.35rem;
         position: relative;
         z-index: 1;
+        padding: 0.35rem 0.45rem 0.55rem;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
       }
       .preview-audio audio {
         width: 100%;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(232, 160, 32, 0.12);
-        box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(232, 160, 32, 0.10);
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.22);
       }
       .preview-mode-badge {
         flex-shrink: 0;
         font-size: 0.72rem;
         font-family: var(--mono);
-        background: rgba(57, 224, 90, 0.1);
+        background: rgba(57, 224, 90, 0.14);
         color: var(--vu-green);
-        border: 1px solid rgba(57, 224, 90, 0.3);
+        border: 1px solid rgba(57, 224, 90, 0.26);
         border-radius: 999px;
-        padding: 5px 9px;
+        padding: 6px 11px;
         white-space: nowrap;
+        box-shadow: 0 0 12px rgba(57, 224, 90, 0.08);
       }
       .preview-wrap canvas {
         width: 100%;
         max-width: 100%;
         min-height: 430px;
         display: block;
-        border-radius: 14px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(17, 15, 10, 0.95));
-        border: 1px solid rgba(232, 160, 32, 0.12);
-        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+        border-radius: 16px;
+        background: radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.05), transparent 20%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(17, 15, 10, 0.95));
+        border: 1px solid rgba(232, 160, 32, 0.14);
+        box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.04);
         margin: 0;
+      }
+      .preview-canvas-wrap {
+        display: grid;
+        gap: 0.35rem;
+      }
+      .preview-canvas-label {
+        font-size: 0.72rem;
+        font-family: var(--mono);
+        color: rgba(157, 155, 143, 0.95);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding-left: 0.1rem;
       }
       .preview-subsection {
         display: grid;
         gap: 0.65rem;
-        padding: 0.85rem;
+        padding: 0.9rem;
         border-radius: 14px;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        backdrop-filter: blur(8px);
+        background: rgba(255, 255, 255, 0.045);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
         position: relative;
         z-index: 1;
       }
@@ -4654,10 +4698,13 @@
 
             <div class="preview-wrap" id="previewWrap" style="display: none">
               <div class="preview-header">
-                <h3>
-                  <span class="preview-live-dot" id="previewDot"></span>
-                  Preview en tiempo real
-                </h3>
+                <div>
+                  <h3>
+                    <span class="preview-live-dot" id="previewDot"></span>
+                    Preview en tiempo real
+                  </h3>
+                  <div class="preview-subtitle">Master chain preview · audio module · visual feedback</div>
+                </div>
                 <span class="preview-mode-badge" id="previewModeBadge">backend 10s</span>
               </div>
               <div id="liveSpectrumWrap" class="preview-subsection" style="display: none;">
@@ -4723,7 +4770,10 @@
                   "
                 ></div>
               </div>
-              <canvas id="previewCanvas"></canvas>
+              <div class="preview-canvas-wrap">
+                <div class="preview-canvas-label">Spectrum monitor</div>
+                <canvas id="previewCanvas"></canvas>
+              </div>
               <div class="preview-audio" id="previewAudioWrap"></div>
             </div>
           </div>
