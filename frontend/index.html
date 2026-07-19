@@ -2092,7 +2092,7 @@
       .preview-wrap canvas {
         width: 100%;
         max-width: 100%;
-        min-height: 430px;
+        min-height: 300px;
         display: block;
         border-radius: 16px;
         background: radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.06), transparent 18%),
@@ -2100,6 +2100,10 @@
         border: 1px solid rgba(232, 160, 32, 0.14);
         box-shadow: inset 0 0 22px rgba(255, 255, 255, 0.04);
         margin: 0;
+      }
+
+      @media (max-width: 900px) {
+        .preview-wrap canvas { min-height: 220px; }
       }
       .preview-canvas-wrap {
         display: grid;
@@ -4766,7 +4770,7 @@
                   <span class="preview-status-dot"></span>
                   <span>Analizador de espectro en vivo</span>
                 </div>
-                <canvas id="jobSpectrumCanvas" height="100" class="preview-spectrum-canvas"></canvas>
+                <canvas id="jobSpectrumCanvas" height="100" class="preview-spectrum-canvas" aria-label="Espectro en tiempo real, barras de frecuencia"></canvas>
               </div>
               <div id="dynEqRecWrap" class="preview-subsection" style="display: none;">
                 <div
@@ -4805,9 +4809,9 @@
               </div>
               <div class="preview-canvas-wrap">
                 <div class="preview-canvas-label">Spectrum monitor</div>
-                <canvas id="previewCanvas"></canvas>
+                <canvas id="previewCanvas" aria-label="Monitor de espectro del preview"></canvas>
               </div>
-              <div class="preview-audio" id="previewAudioWrap"></div>
+              <div class="preview-audio" id="previewAudioWrap" aria-live="polite"></div>
             </div>
           </div>
           <!-- /content-grid -->
@@ -8662,19 +8666,43 @@ self.onmessage = function(e) {
         });
 
         if (PREVIEW_SPECTRUM_MODE === 'third-octave') {
-          // Dibujar barras por tercio de octava
+          // Dibujar barras por tercio de octava con gradiente cálido y esquinas redondeadas
           const bands = computeThirdOctaveBands(dataL, dataR, sampleRate, metersAnalyserL?.minDecibels ?? -85, metersAnalyserL?.maxDecibels ?? -5);
           const N = bands.freqs.length;
           const barW = plotW / N;
+          // gradiente global de bajo (ámbar) -> alto (lilac)
           for (let i = 0; i < N; i++) {
             const db = bands.values[i];
             const t = Math.max(0, Math.min(1, (db - minDb) / (maxDb - minDb)));
             const x = padL + i * barW + 1;
             const y = padT + (1 - t) * plotH;
             const h = plotH - (y - padT);
-            const hue = 42 - (i / N) * 16;
-            ctx.fillStyle = `hsl(${hue},78%,${36 + t * 24}%)`;
-            ctx.fillRect(x, y, Math.max(1, barW - 2), Math.max(1, h));
+            const g = ctx.createLinearGradient(0, y, 0, y + h);
+            g.addColorStop(0, theme.get('--accent2'));
+            g.addColorStop(1, theme.accent);
+            ctx.fillStyle = g;
+            // sombra sutil para resaltar
+            ctx.shadowColor = 'rgba(0,0,0,0.28)';
+            ctx.shadowBlur = 6;
+            // dibujar rectángulo con esquinas redondeadas
+            const rw = Math.max(1, barW - 3);
+            const rh = Math.max(1, h);
+            const rx = x;
+            const ry = y;
+            const r = Math.min(6, rw * 0.25, rh * 0.25);
+            ctx.beginPath();
+            ctx.moveTo(rx + r, ry);
+            ctx.lineTo(rx + rw - r, ry);
+            ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + r);
+            ctx.lineTo(rx + rw, ry + rh - r);
+            ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - r, ry + rh);
+            ctx.lineTo(rx + r, ry + rh);
+            ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - r);
+            ctx.lineTo(rx, ry + r);
+            ctx.quadraticCurveTo(rx, ry, rx + r, ry);
+            ctx.closePath();
+            ctx.fill();
+            ctx.shadowBlur = 0;
           }
         } else {
           ctx.beginPath();
@@ -8796,6 +8824,11 @@ self.onmessage = function(e) {
 
       function startPreviewSpectrum(audioEl) {
         stopPreviewSpectrum();
+        try {
+          if (audioEl && !audioEl.getAttribute('aria-label')) {
+            audioEl.setAttribute('aria-label', 'Preview audio — reproducir/pausar');
+          }
+        } catch (e) {}
         try {
           previewAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
           previewSourceNode = previewAudioCtx.createMediaElementSource(audioEl);
