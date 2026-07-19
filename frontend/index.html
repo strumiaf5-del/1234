@@ -7684,6 +7684,8 @@ self.onmessage = function(e) {
           } catch (e) {}
           previewWS = null;
         }
+        // Detener cualquier espectro previo del reproductor
+        try { stopPreviewSpectrum(); } catch (e) {}
         previewAbortController = new AbortController();
         const wrap = document.getElementById("previewWrap");
         wrap.style.display = "block";
@@ -7884,7 +7886,9 @@ self.onmessage = function(e) {
             // Fallback silencioso
             if (previewAudioUrl) URL.revokeObjectURL(previewAudioUrl);
             previewAudioUrl = URL.createObjectURL(blob16);
-            document.getElementById("previewAudioWrap").innerHTML = `<audio controls src="${previewAudioUrl}"></audio>`;
+              document.getElementById("previewAudioWrap").innerHTML = `<audio controls src="${previewAudioUrl}"></audio>`;
+              const _audioEl3 = document.querySelector('#previewAudioWrap audio');
+              if (_audioEl3) startPreviewSpectrum(_audioEl3);
             setPreviewStatus("Preview listo ✓ · meters actualizados en tiempo real");
           }
           setPreviewUpdating(false);
@@ -7928,12 +7932,17 @@ self.onmessage = function(e) {
         "s-eq1q",
         "s-eq2freq",
         "s-eq2gain",
+              // Conectar el audio del player al espectro en tiempo real
+              const _audioEl = document.querySelector('#previewAudioWrap audio');
+              if (_audioEl) startPreviewSpectrum(_audioEl);
         "s-eq2q",
         "s-eq3freq",
         "s-eq3gain",
         "s-eq3q",
         "s-eq4freq",
         "s-eq4gain",
+              const _audioEl2 = document.querySelector('#previewAudioWrap audio');
+              if (_audioEl2) startPreviewSpectrum(_audioEl2);
         "s-eq4q",
         "s-eq5freq",
         "s-eq5gain",
@@ -8523,6 +8532,88 @@ self.onmessage = function(e) {
         }
       }
 
+      // ── Espectro del reproductor de preview (audio element) ───────────────
+      let previewAudioCtx = null;
+      let previewSourceNode = null;
+      let previewSplitter = null;
+      let previewAnalyserL = null;
+      let previewAnalyserR = null;
+      let previewFreqDataL = null;
+      let previewFreqDataR = null;
+      let previewSpectrumRafId = null;
+
+      function stopPreviewSpectrum() {
+        if (previewSpectrumRafId) {
+          cancelAnimationFrame(previewSpectrumRafId);
+          previewSpectrumRafId = null;
+        }
+        try {
+          if (previewSourceNode) previewSourceNode.disconnect();
+        } catch (e) {}
+        try {
+          if (previewAnalyserL) previewAnalyserL.disconnect();
+        } catch (e) {}
+        try {
+          if (previewAnalyserR) previewAnalyserR.disconnect();
+        } catch (e) {}
+        try {
+          if (previewSplitter) previewSplitter.disconnect();
+        } catch (e) {}
+        try {
+          if (previewAudioCtx) previewAudioCtx.close();
+        } catch (e) {}
+        previewAudioCtx = null;
+        previewSourceNode = null;
+        previewSplitter = null;
+        previewAnalyserL = null;
+        previewAnalyserR = null;
+        previewFreqDataL = null;
+        previewFreqDataR = null;
+      }
+
+      function startPreviewSpectrum(audioEl) {
+        stopPreviewSpectrum();
+        try {
+          previewAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          previewSourceNode = previewAudioCtx.createMediaElementSource(audioEl);
+          previewSplitter = previewAudioCtx.createChannelSplitter(2);
+          previewAnalyserL = previewAudioCtx.createAnalyser();
+          previewAnalyserR = previewAudioCtx.createAnalyser();
+          previewAnalyserL.fftSize = 2048;
+          previewAnalyserR.fftSize = 2048;
+          previewAnalyserL.minDecibels = -85;
+          previewAnalyserL.maxDecibels = -5;
+          previewAnalyserR.minDecibels = -85;
+          previewAnalyserR.maxDecibels = -5;
+          previewSourceNode.connect(previewSplitter);
+          previewSplitter.connect(previewAnalyserL, 0);
+          previewSplitter.connect(previewAnalyserR, 1);
+          previewAnalyserL.connect(previewAudioCtx.destination);
+          // previewAnalyserR.connect(previewAudioCtx.destination); // not necessary to connect twice
+
+          const len = previewAnalyserL.frequencyBinCount;
+          previewFreqDataL = new Uint8Array(len);
+          previewFreqDataR = new Uint8Array(len);
+
+          const canvas = document.getElementById("previewCanvas");
+          function tick() {
+            if (!previewAnalyserL) return;
+            previewAnalyserL.getByteFrequencyData(previewFreqDataL);
+            previewAnalyserR.getByteFrequencyData(previewFreqDataR);
+            // Pass analyser decibel range so drawing scales correctly
+            drawLiveSpectrum(canvas, previewFreqDataL, previewFreqDataR, previewAudioCtx.sampleRate, previewAnalyserL.minDecibels, previewAnalyserL.maxDecibels);
+            updateFreqBands(previewFreqDataL, previewFreqDataR, previewAudioCtx.sampleRate, previewAnalyserL.minDecibels, previewAnalyserL.maxDecibels);
+            previewSpectrumRafId = requestAnimationFrame(tick);
+          }
+          // Try to resume context on user gesture if suspended
+          if (previewAudioCtx.state === 'suspended') previewAudioCtx.resume().catch(()=>{});
+          previewSpectrumRafId = requestAnimationFrame(tick);
+        } catch (err) {
+          console.warn('startPreviewSpectrum failed:', err);
+          stopPreviewSpectrum();
+        }
+      }
+
       document.getElementById("metersToggle").addEventListener("click", () => {
         const body = document.getElementById("metersBody");
         const hidden = body.style.display === "none";
@@ -8533,6 +8624,7 @@ self.onmessage = function(e) {
       window.addEventListener("beforeunload", () => {
         stopDashboard();
         teardownLiveMeters();
+        try { stopPreviewSpectrum(); } catch (e) {}
       });
 
       // ═══════════════════════════════════════════════════════════════════════════
