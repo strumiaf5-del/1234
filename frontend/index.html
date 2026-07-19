@@ -19,27 +19,27 @@
 
       :root {
         /* ── Fondos ── */
-        --bg: #0a0907;
-        --surface: #131109;
-        --surface2: #1c1913;
-        --surface3: #25211a;
-        --border: #332d22;
-        --border2: #131f41;
+        --bg: #1d1914;
+        --surface: #25201a;
+        --surface2: #332c22;
+        --surface3: #413623;
+        --border: #5b4f3e;
+        --border2: #3f3528;
 
         /* ── Colores de señal ── */
-        --amber: #e8a020; /* acento principal — ámbar cálido */
-        --amber2: #c47a10; /* ámbar oscuro */
-        --amber-glow: rgba(232, 160, 32, 0.18);
-        --vu-green: #39e05a; /* VU meter verde */
-        --vu-yellow: #e8d220; /* VU meter amarillo */
-        --clip-red: #e83020; /* clip / error */
-        --cyan: #20c8e8; /* info / análisis */
-        --lilac: #a080d0; /* AI / accent2 */
+        --amber: #e7b15a; /* acento principal — ámbar suave */
+        --amber2: #c18b3f; /* ámbar oscuro */
+        --amber-glow: rgba(231, 177, 90, 0.18);
+        --vu-green: #a39968; /* VU meter verde/dorado más suave */
+        --vu-yellow: #d6c46f; /* VU meter amarillo */
+        --clip-red: #d24f46; /* clip / error */
+        --cyan: #b49470; /* info / análisis cálido */
+        --lilac: #9a7fb8; /* AI / accent2 */
 
         /* ── Texto ── */
-        --text: #d7d2c5;
-        --muted: #9d9b8f;
-        --faint: #6f6d63;
+        --text: #f1ebdd;
+        --muted: #c7bca3;
+        --faint: #a59f84;
 
         /* ── Tipografía ── */
         --mono: "IBM Plex Mono", "Courier New", monospace;
@@ -48,7 +48,7 @@
         /* ── Aliases para compatibilidad con el JS original ── */
         --accent: var(--amber);
         --accent2: var(--lilac);
-        --green: var(--vu-green);
+        --green: var(--vu-yellow);
         --yellow: var(--vu-yellow);
         --red: var(--clip-red);
         --blue: var(--cyan);
@@ -71,8 +71,8 @@
         position: relative;
         background:
           radial-gradient(circle at 25% 8%, rgba(232, 160, 32, 0.14), transparent 18%),
-          radial-gradient(circle at 90% 15%, rgba(57, 224, 90, 0.08), transparent 18%),
-          linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.14)),
+          radial-gradient(circle at 90% 15%, rgba(231, 177, 90, 0.08), transparent 18%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(22, 17, 13, 0.12)),
           var(--bg);
         color: var(--text);
         font-family: var(--sans);
@@ -90,7 +90,7 @@
         pointer-events: none;
         background:
           radial-gradient(circle at 30% 20%, rgba(232, 160, 32, 0.08), transparent 26%),
-          radial-gradient(circle at 82% 18%, rgba(57, 224, 90, 0.06), transparent 24%),
+          radial-gradient(circle at 82% 18%, rgba(231, 177, 90, 0.06), transparent 24%),
           repeating-linear-gradient(180deg, transparent 0, transparent 34px, rgba(255, 255, 255, 0.02) 34px, rgba(255, 255, 255, 0.02) 35px);
         opacity: 0.22;
         z-index: 0;
@@ -102,7 +102,7 @@
         pointer-events: none;
         background:
           radial-gradient(circle at 40% 20%, rgba(232, 160, 32, 0.065), transparent 30%),
-          radial-gradient(circle at 80% 13%, rgba(57, 224, 90, 0.05), transparent 24%),
+          radial-gradient(circle at 80% 13%, rgba(231, 177, 90, 0.05), transparent 24%),
           repeating-linear-gradient(180deg, transparent 0, transparent 34px, rgba(255, 255, 255, 0.03) 34px, rgba(255, 255, 255, 0.03) 35px);
         opacity: 0.28;
         z-index: 0;
@@ -140,10 +140,10 @@
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: var(--vu-green);
+        background: var(--vu-yellow);
         box-shadow:
-          0 0 8px var(--vu-green),
-          0 0 16px rgba(57, 224, 90, 0.4);
+          0 0 8px rgba(231, 177, 90, 0.45),
+          0 0 16px rgba(231, 177, 90, 0.28);
         animation: vu-pulse 2.4s ease-in-out infinite;
       }
       @keyframes vu-pulse {
@@ -151,12 +151,12 @@
         100% {
           opacity: 1;
           box-shadow:
-            0 0 8px var(--vu-green),
-            0 0 16px rgba(57, 224, 90, 0.4);
+            0 0 8px rgba(231, 177, 90, 0.45),
+            0 0 16px rgba(231, 177, 90, 0.28);
         }
         50% {
           opacity: 0.5;
-          box-shadow: 0 0 4px var(--vu-green);
+          box-shadow: 0 0 4px rgba(231, 177, 90, 0.45);
         }
       }
       header small {
@@ -503,7 +503,7 @@
         line-height: 1.4;
       }
       .drop-zone .file-name {
-        color: var(--vu-green);
+        color: var(--vu-yellow);
         font-family: var(--mono);
         font-size: 0.75rem;
         margin-top: 0.4rem;
@@ -619,14 +619,14 @@
         margin-top: 0.4rem;
       }
       .btn-secondary:not(:disabled):hover {
-        border-color: var(--cyan);
-        color: var(--cyan);
+        border-color: var(--amber);
+        color: var(--amber);
       }
 
       .btn-download {
-        background: rgba(57, 224, 90, 0.12);
-        border: 1px solid var(--vu-green);
-        color: var(--vu-green);
+        background: rgba(231, 177, 90, 0.14);
+        border: 1px solid var(--amber);
+        color: var(--surface);
         margin-top: 0.4rem;
         display: none;
         font-weight: 700;
@@ -645,19 +645,19 @@
         display: none;
       }
       .btn-automaster {
-        background: linear-gradient(135deg, var(--vu-green) 0%, #20a840 50%, var(--amber) 100%);
-        color: #0a0907;
+        background: linear-gradient(135deg, var(--amber2) 0%, var(--amber) 50%, rgba(231, 177, 90, 0.95) 100%);
+        color: var(--surface);
         font-weight: 700;
-        box-shadow: 0 2px 14px rgba(57, 224, 90, 0.2);
+        box-shadow: 0 2px 14px rgba(231, 177, 90, 0.22);
         position: relative;
         overflow: hidden;
       }
       .btn-automaster:not(:disabled):hover {
-        box-shadow: 0 4px 20px rgba(57, 224, 90, 0.35);
+        box-shadow: 0 4px 20px rgba(231, 177, 90, 0.35);
       }
       .btn-ref {
-        background: linear-gradient(135deg, var(--lilac), #7060b0);
-        color: #fff;
+        background: linear-gradient(135deg, rgba(160, 128, 208, 0.14), rgba(231, 177, 90, 0.2));
+        color: var(--text);
         font-size: 0.8rem;
       }
 
@@ -883,7 +883,7 @@
       .mb-wrap {
         background: var(--surface);
         border: 1px solid var(--border);
-        border-left: 2px solid var(--cyan);
+        border-left: 2px solid rgba(231, 177, 90, 0.5);
         border-radius: 8px;
         padding: 1rem;
         margin-top: 0.8rem;
@@ -892,7 +892,7 @@
         font-size: 0.7rem;
         font-family: var(--mono);
         letter-spacing: 0.1em;
-        color: var(--cyan);
+        color: #d4c18d;
         text-transform: uppercase;
         margin-bottom: 0.7rem;
         display: flex;
@@ -963,7 +963,7 @@
       /* ── Hero panel ── */
       .workflow-hero {
         background: radial-gradient(circle at 20% 40%, rgba(232, 160, 32, 0.12), transparent 35%),
-          radial-gradient(circle at 85% 20%, rgba(57, 224, 90, 0.08), transparent 26%),
+          radial-gradient(circle at 85% 20%, rgba(231, 177, 90, 0.08), transparent 26%),
           linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(17, 15, 10, 0.95));
         border: 1px solid rgba(232, 160, 32, 0.18);
         border-radius: 16px;
@@ -1111,8 +1111,8 @@
         animation: vu-pulse 0.5s infinite;
       }
       .status-dot.done {
-        background: var(--vu-green);
-        box-shadow: 0 0 8px var(--vu-green);
+        background: var(--vu-yellow);
+        box-shadow: 0 0 8px rgba(231, 177, 90, 0.4);
       }
       .status-dot.error {
         background: var(--clip-red);
@@ -1141,7 +1141,7 @@
       }
       .progress-bar {
         height: 100%;
-        background: linear-gradient(90deg, var(--amber), var(--vu-green));
+        background: linear-gradient(90deg, var(--amber), var(--vu-yellow));
         width: 0%;
         transition: width 0.35s;
         border-radius: 3px;
@@ -1202,14 +1202,14 @@
       .analysis-panel {
         background: var(--surface);
         border: 1px solid var(--border);
-        border-left: 2px solid var(--cyan);
+        border-left: 2px solid rgba(231, 177, 90, 0.5);
         border-radius: 7px;
         padding: 0.55rem;
       }
       .professional-meter {
         background: var(--surface);
         border: 1px solid var(--border);
-        border-left: 2px solid var(--green);
+        border-left: 2px solid rgba(231, 177, 90, 0.5);
         border-radius: 7px;
         padding: 0.75rem;
         margin-top: 0.7rem;
@@ -1218,7 +1218,7 @@
         font-size: 0.7rem;
         font-family: var(--mono);
         letter-spacing: 0.1em;
-        color: var(--green);
+        color: #d4c18d;
         text-transform: uppercase;
         margin-bottom: 0.85rem;
       }
@@ -1272,7 +1272,7 @@
         font-size: 0.7rem;
         font-family: var(--mono);
         letter-spacing: 0.1em;
-        color: var(--cyan);
+        color: #d4c18d;
         text-transform: uppercase;
         margin-bottom: 0.8rem;
       }
@@ -1295,7 +1295,7 @@
         font-weight: 700;
       }
       .metric-value.good {
-        color: var(--vu-green);
+        color: var(--vu-yellow);
       }
       .metric-value.warn {
         color: var(--vu-yellow);
@@ -1369,7 +1369,7 @@
       .waveform-wrap {
         background: var(--surface);
         border: 1px solid var(--border);
-        border-left: 2px solid var(--vu-green);
+        border-left: 2px solid rgba(231, 177, 90, 0.5);
         border-radius: 7px;
         padding: 0.55rem;
       }
@@ -1377,7 +1377,7 @@
         font-size: 0.7rem;
         font-family: var(--mono);
         letter-spacing: 0.1em;
-        color: var(--vu-green);
+        color: #d4c18d;
         text-transform: uppercase;
         margin-bottom: 0.8rem;
         display: flex;
@@ -1423,8 +1423,8 @@
         width: 7px;
         height: 7px;
         border-radius: 50%;
-        background: var(--vu-green);
-        box-shadow: 0 0 7px var(--vu-green);
+        background: var(--vu-yellow);
+        box-shadow: 0 0 7px rgba(231, 177, 90, 0.55);
         animation: vu-pulse 1.4s infinite;
       }
       .dash-grid {
@@ -1443,13 +1443,13 @@
         border-top: 2px solid var(--amber);
       }
       .dash-card:nth-child(4n + 2) {
-        border-top: 2px solid var(--cyan);
+        border-top: 2px solid rgba(231, 177, 90, 0.5);
       }
       .dash-card:nth-child(4n + 3) {
         border-top: 2px solid var(--orange);
       }
       .dash-card:nth-child(4n + 4) {
-        border-top: 2px solid var(--vu-green);
+        border-top: 2px solid rgba(231, 177, 90, 0.55);
       }
       .dash-card .dash-label {
         font-size: 0.62rem;
@@ -1475,7 +1475,7 @@
       .dash-bar-fill {
         height: 100%;
         border-radius: 2px;
-        background: linear-gradient(90deg, var(--amber), var(--vu-green));
+        background: linear-gradient(90deg, var(--amber), rgba(231, 177, 90, 0.8));
         transition: width 0.3s;
       }
       .dash-queue-row {
@@ -1546,8 +1546,8 @@
         width: 100%;
         background: linear-gradient(
           to top,
-          var(--vu-green) 0%,
-          var(--vu-green) 60%,
+          rgba(211, 181, 110, 0.94) 0%,
+          rgba(211, 181, 110, 0.72) 60%,
           var(--vu-yellow) 80%,
           var(--clip-red) 100%
         );
@@ -1629,7 +1629,7 @@
       .freqband-fill {
         height: 100%;
         width: 0%;
-        background: linear-gradient(90deg, var(--amber), var(--vu-green));
+        background: linear-gradient(90deg, var(--amber), var(--vu-yellow));
         transition: width 0.1s;
       }
       .freqband-val {
@@ -1815,7 +1815,7 @@
         right: 0;
         width: 45%;
         border-radius: 0 2px 2px 0;
-        background: linear-gradient(to top, var(--amber), var(--vu-green));
+        background: linear-gradient(to top, var(--amber), var(--vu-yellow));
         transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       }
       .bar-label {
@@ -1999,7 +1999,7 @@
         left: 28px;
         width: 240px;
         height: 110px;
-        background: linear-gradient(130deg, transparent 0%, rgba(57, 224, 90, 0.07) 50%, transparent 100%);
+        background: linear-gradient(130deg, transparent 0%, rgba(231, 177, 90, 0.08) 50%, transparent 100%);
         filter: blur(14px);
         pointer-events: none;
       }
@@ -2055,13 +2055,13 @@
         flex-shrink: 0;
         font-size: 0.72rem;
         font-family: var(--mono);
-        background: rgba(57, 224, 90, 0.14);
-        color: var(--vu-green);
-        border: 1px solid rgba(57, 224, 90, 0.26);
+        background: rgba(231, 177, 90, 0.14);
+        color: #d4c18d;
+        border: 1px solid rgba(231, 177, 90, 0.22);
         border-radius: 999px;
         padding: 6px 11px;
         white-space: nowrap;
-        box-shadow: 0 0 12px rgba(57, 224, 90, 0.08);
+        box-shadow: 0 0 12px rgba(231, 177, 90, 0.08);
       }
       .preview-wrap canvas {
         width: 100%;
@@ -2149,10 +2149,10 @@
         font-weight: 600;
       }
       .advice-grade.grade-ex {
-        color: var(--vu-green);
+        color: var(--vu-yellow);
       }
       .advice-grade.grade-good {
-        color: #7cfc90;
+        color: var(--vu-yellow);
       }
       .advice-grade.grade-ok {
         color: var(--vu-yellow);
@@ -2181,7 +2181,7 @@
       }
       .advice-tips li {
         font-size: 0.76rem;
-        color: var(--vu-green);
+        color: #d4c18d;
         padding: 0.28rem 0;
         border-bottom: 1px solid var(--border);
         display: flex;
@@ -2270,8 +2270,8 @@
         border-radius: 2px;
       }
       .delta.up {
-        background: rgba(57, 224, 90, 0.15);
-        color: var(--vu-green);
+        background: rgba(231, 177, 90, 0.14);
+        color: var(--vu-yellow);
       }
       .delta.down {
         background: rgba(232, 48, 32, 0.15);
@@ -2385,9 +2385,9 @@
         background: rgba(232, 160, 32, 0.12);
       }
       .workflow-chip.done {
-        color: var(--vu-green);
-        border-color: rgba(57, 224, 90, 0.3);
-        background: rgba(57, 224, 90, 0.08);
+        color: var(--vu-yellow);
+        border-color: rgba(231, 177, 90, 0.28);
+        background: rgba(231, 177, 90, 0.08);
       }
 
       /* ── Studio hero (sidebar) ── */
@@ -2458,10 +2458,10 @@
         width: 9px;
         height: 9px;
         border-radius: 50%;
-        background: var(--vu-green);
+        background: var(--vu-yellow);
         border: 2px solid var(--bg);
         display: none;
-        box-shadow: 0 0 6px var(--vu-green);
+        box-shadow: 0 0 6px rgba(231, 177, 90, 0.45);
       }
       .ai-fab.has-context .ai-fab-dot {
         display: block;
@@ -3892,7 +3892,7 @@
                 <!-- ── Etapa 8: Compresor Multibanda ── -->
                 <div class="mb-wrap" id="mbWrap">
                   <h3>
-                    <span class="stage-num" style="color: var(--cyan)">8</span>
+                    <span class="stage-num" style="color: #d4c18d">8</span>
                     🔊 Compresor Multibanda
                     <label
                       style="
@@ -5324,7 +5324,7 @@
           applyPresetToUI(presetData);
           document.querySelectorAll(".preset-btn.active").forEach((b) => b.classList.remove("active"));
           activePreset = data.name || file.name.replace(/\.json$/i, "");
-          statusEl.style.color = "var(--green)";
+          statusEl.style.color = "var(--yellow)";
           statusEl.textContent = `✓ Preset "${activePreset}" cargado desde JSON`;
         } catch (err) {
           console.error("Error cargando preset JSON:", err);
@@ -5888,7 +5888,7 @@
             : lufsValue > -9
               ? "var(--yellow)"
               : lufsValue >= -18
-                ? "var(--green)"
+                ? "var(--yellow)"
                 : "var(--muted)";
       }
 
@@ -7003,7 +7003,7 @@
               if (data.analysis_reference?.fft_spectrum && data.analysis_after?.fft_spectrum) {
                 renderFFT([
                   { label: "Referencia", data: data.analysis_reference.fft_spectrum, color: "var(--accent2)" },
-                  { label: "Resultado", data: data.analysis_after.fft_spectrum, color: "var(--green)" },
+                  { label: "Resultado", data: data.analysis_after.fft_spectrum, color: "var(--yellow)" },
                 ]);
               }
               if (data.mix_advice_after) renderAdvicePanel(data.mix_advice_after, "Evaluación", "— Resultado");
