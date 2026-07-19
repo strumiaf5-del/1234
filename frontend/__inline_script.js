@@ -3701,11 +3701,48 @@ self.onmessage = function(e) {
       // así que no agrega ningún AudioContext ni nodo extra — solo lee también el
       // dominio de frecuencia (getByteFrequencyData) del mismo grafo de audio.
       let _specXCache = null; // cache de mapeo bin→x en escala log, invalidado si cambia el tamaño del canvas
-      function drawLiveSpectrum(canvas, dataL, dataR, sampleRate) {
+      // Modo de visualización del preview: 'continuous' o 'third-octave'
+      const PREVIEW_SPECTRUM_MODE = 'third-octave';
+
+      function computeThirdOctaveBands(dataL, dataR, sampleRate, minDb, maxDb) {
+        // devuelve { freqs: [...], values: [...] } con valores en dB
+        const nyquist = sampleRate / 2;
+        const binHz = nyquist / dataL.length;
+        const DB_MIN = minDb, DB_MAX = maxDb;
+        // Generar centros de tercio de octava desde 31.25Hz aprox hasta 16k
+        const bands = [];
+        for (let f = 25; f < nyquist; f *= Math.pow(2, 1 / 3)) {
+          bands.push(f);
+          if (bands.length > 60) break;
+        }
+        const vals = new Float32Array(bands.length);
+        for (let b = 0; b < bands.length; b++) {
+          const fc = bands[b];
+          const fl = fc / Math.pow(2, 1 / 6);
+          const fh = fc * Math.pow(2, 1 / 6);
+          const iStart = Math.max(1, Math.floor(fl / binHz));
+          const iEnd = Math.min(dataL.length - 1, Math.ceil(fh / binHz));
+          if (iEnd < iStart) {
+            vals[b] = DB_MIN;
+            continue;
+          }
+          // promedio en potencia
+          let sumPow = 0;
+          for (let i = iStart; i <= iEnd; i++) {
+            const byte = (dataL[i] + dataR[i]) / 2;
+            const db = DB_MIN + (byte / 255) * (DB_MAX - DB_MIN);
+            sumPow += Math.pow(10, db / 10);
+          }
+          const avgPow = sumPow / (iEnd - iStart + 1);
+          vals[b] = 10 * Math.log10(avgPow + 1e-12);
+        }
+        return { freqs: bands, values: vals };
+      }
+      function drawLiveSpectrum(canvas, dataL, dataR, sampleRate, minDb = -85, maxDb = -5) {
         if (!canvas) return;
         const dpr = window.devicePixelRatio || 1;
         const cssWidth = canvas.clientWidth || 280,
-          cssHeight = 90;
+          cssHeight = canvas.clientHeight || 180;
         if (canvas._lastCssW !== cssWidth || canvas._lastDpr !== dpr) {
           canvas.width = cssWidth * dpr;
           canvas.height = cssHeight * dpr;
@@ -3761,29 +3798,46 @@ self.onmessage = function(e) {
           ctx.fillText(f >= 1000 ? f / 1000 + "k" : String(f), x - 8, cssHeight - 3);
         });
 
-        ctx.beginPath();
-        let started = false,
-          lastX = padL;
-        for (let i = startBin; i < dataL.length; i++) {
-          const x = xs[i];
-          if (x < 0) break;
-          const mag = (dataL[i] + dataR[i]) / 2 / 255; // 0..1, ya escalado a minDecibels..maxDecibels por el AnalyserNode
-          const y = padT + plotH - mag * plotH;
-          if (!started) {
-            ctx.moveTo(x, y);
-            started = true;
-          } else ctx.lineTo(x, y);
-          lastX = x;
-        }
-        if (started) {
-          ctx.strokeStyle = theme.accent;
-          ctx.lineWidth = 1.5;
-          ctx.stroke();
-          ctx.lineTo(lastX, padT + plotH);
-          ctx.lineTo(padL, padT + plotH);
-          ctx.closePath();
-          ctx.fillStyle = "rgba(124,92,252,0.16)";
-          ctx.fill();
+        if (PREVIEW_SPECTRUM_MODE === 'third-octave') {
+          // Dibujar barras por tercio de octava
+          const bands = computeThirdOctaveBands(dataL, dataR, sampleRate, metersAnalyserL?.minDecibels ?? -85, metersAnalyserL?.maxDecibels ?? -5);
+          const N = bands.freqs.length;
+          const barW = plotW / N;
+          for (let i = 0; i < N; i++) {
+            const db = bands.values[i];
+            const t = Math.max(0, Math.min(1, (db - minDb) / (maxDb - minDb)));
+            const x = padL + i * barW + 1;
+            const y = padT + (1 - t) * plotH;
+            const h = plotH - (y - padT);
+            const hue = 240 - (i / N) * 240;
+            ctx.fillStyle = `hsl(${hue},60%,60%)`;
+            ctx.fillRect(x, y, Math.max(1, barW - 2), Math.max(1, h));
+          }
+        } else {
+          ctx.beginPath();
+          let started = false,
+            lastX = padL;
+          for (let i = startBin; i < dataL.length; i++) {
+            const x = xs[i];
+            if (x < 0) break;
+            const mag = (dataL[i] + dataR[i]) / 2 / 255; // 0..1, ya escalado a minDecibels..maxDecibels por el AnalyserNode
+            const y = padT + plotH - mag * plotH;
+            if (!started) {
+              ctx.moveTo(x, y);
+              started = true;
+            } else ctx.lineTo(x, y);
+            lastX = x;
+          }
+          if (started) {
+            ctx.strokeStyle = theme.accent;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.lineTo(lastX, padT + plotH);
+            ctx.lineTo(padL, padT + plotH);
+            ctx.closePath();
+            ctx.fillStyle = "rgba(124,92,252,0.16)";
+            ctx.fill();
+          }
         }
       }
 
@@ -3885,12 +3939,16 @@ self.onmessage = function(e) {
           previewSplitter = previewAudioCtx.createChannelSplitter(2);
           previewAnalyserL = previewAudioCtx.createAnalyser();
           previewAnalyserR = previewAudioCtx.createAnalyser();
-          previewAnalyserL.fftSize = 2048;
-          previewAnalyserR.fftSize = 2048;
+          // Mayor resolución para un espectro más definido (4096 -> 2048 bins)
+          previewAnalyserL.fftSize = 4096;
+          previewAnalyserR.fftSize = 4096;
           previewAnalyserL.minDecibels = -85;
           previewAnalyserL.maxDecibels = -5;
           previewAnalyserR.minDecibels = -85;
           previewAnalyserR.maxDecibels = -5;
+          // Reducir suavizado para visual más nítida
+          previewAnalyserL.smoothingTimeConstant = 0.3;
+          previewAnalyserR.smoothingTimeConstant = 0.3;
           previewSourceNode.connect(previewSplitter);
           previewSplitter.connect(previewAnalyserL, 0);
           previewSplitter.connect(previewAnalyserR, 1);
