@@ -7629,7 +7629,12 @@
 
       function setPreviewUpdating(v) {
         const dot = document.getElementById("previewDot");
+        const panelDot = document.getElementById("previewPanelDot");
         if (dot) dot.classList.toggle("updating", v);
+        if (panelDot) panelDot.classList.toggle("updating", v);
+        // pequeño pulso en el badge cuando hay actividad
+        const badge = document.getElementById("previewModeBadge");
+        if (badge) badge.style.opacity = v ? "1" : "0.92";
       }
 
       // ── FFT Web Worker ────────────────────────────────────────────────────────────
