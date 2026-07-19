@@ -2003,6 +2003,23 @@
         filter: blur(14px);
         pointer-events: none;
       }
+      .preview-wrap {
+        grid-column: 1 / -1;
+        padding: 1rem 1rem 1.1rem;
+        border-radius: 18px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(28, 24, 19, 0.82));
+        border: 1px solid rgba(231, 177, 90, 0.16);
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+        position: relative;
+      }
+      .preview-wrap::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 18px;
+        pointer-events: none;
+        background: radial-gradient(circle at 20% 20%, rgba(231, 177, 90, 0.08), transparent 26%);
+      }
       .preview-header {
         display: grid;
         grid-template-columns: 1fr auto;
@@ -2039,14 +2056,15 @@
         gap: 0.35rem;
         position: relative;
         z-index: 1;
-        padding: 0.35rem 0.45rem 0.55rem;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 0.45rem 0.55rem 0.65rem;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(231, 177, 90, 0.12);
+        box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.02);
       }
       .preview-audio audio {
         width: 100%;
-        border-radius: 12px;
+        border-radius: 14px;
         background: rgba(255, 255, 255, 0.06);
         border: 1px solid rgba(232, 160, 32, 0.10);
         box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.22);
@@ -2056,12 +2074,13 @@
         font-size: 0.72rem;
         font-family: var(--mono);
         background: rgba(231, 177, 90, 0.14);
-        color: #d4c18d;
-        border: 1px solid rgba(231, 177, 90, 0.22);
+        color: #f8e5a2;
+        border: 1px solid rgba(231, 177, 90, 0.25);
         border-radius: 999px;
         padding: 6px 11px;
         white-space: nowrap;
-        box-shadow: 0 0 12px rgba(231, 177, 90, 0.08);
+        box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.08);
+        transition: all 0.18s ease;
       }
       .preview-wrap canvas {
         width: 100%;
@@ -2069,10 +2088,10 @@
         min-height: 430px;
         display: block;
         border-radius: 16px;
-        background: radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.05), transparent 20%),
-          linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(17, 15, 10, 0.95));
+        background: radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.06), transparent 18%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(14, 12, 9, 0.96));
         border: 1px solid rgba(232, 160, 32, 0.14);
-        box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.04);
+        box-shadow: inset 0 0 22px rgba(255, 255, 255, 0.04);
         margin: 0;
       }
       .preview-canvas-wrap {
@@ -2086,6 +2105,30 @@
         letter-spacing: 0.12em;
         text-transform: uppercase;
         padding-left: 0.1rem;
+      }
+      .preview-note-row {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        margin-bottom: 0.7rem;
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+      .preview-status-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--amber);
+        border-radius: 50%;
+        box-shadow: 0 0 12px rgba(231, 177, 90, 0.35);
+      }
+      .preview-spectrum-canvas {
+        width: 100%;
+        height: 120px;
+        display: block;
+        border-radius: 8px;
+        background: var(--surface2);
+        border: 1px solid rgba(231, 177, 90, 0.16);
+        box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.03);
       }
       .preview-subsection {
         display: grid;
@@ -4704,36 +4747,19 @@
                     Preview en tiempo real
                   </h3>
                   <div class="preview-subtitle">Master chain preview · audio module · visual feedback</div>
+                  <div class="preview-status-row">
+                    <span class="preview-status-dot" id="previewPanelDot"></span>
+                    <span id="previewPanelStatus">Listo para procesar</span>
+                  </div>
                 </div>
                 <span class="preview-mode-badge" id="previewModeBadge">backend 10s</span>
               </div>
               <div id="liveSpectrumWrap" class="preview-subsection" style="display: none;">
-                <div
-                  style="
-                    font-size: 0.7rem;
-                    color: var(--muted);
-                    display: flex;
-                    align-items: center;
-                    gap: 0.45rem;
-                  "
-                >
-                  <span
-                    style="
-                      display: inline-block;
-                      width: 7px;
-                      height: 7px;
-                      border-radius: 50%;
-                      background: var(--clip-red);
-                      animation: vu-pulse 1s infinite;
-                    "
-                  ></span>
-                  Analizador de espectro en vivo
+                <div class="preview-note-row">
+                  <span class="preview-status-dot"></span>
+                  <span>Analizador de espectro en vivo</span>
                 </div>
-                <canvas
-                  id="jobSpectrumCanvas"
-                  height="80"
-                  style="width: 100%; border-radius: 5px; background: var(--surface2); display: block"
-                ></canvas>
+                <canvas id="jobSpectrumCanvas" height="100" class="preview-spectrum-canvas"></canvas>
               </div>
               <div id="dynEqRecWrap" class="preview-subsection" style="display: none;">
                 <div
@@ -7237,13 +7263,15 @@
           const x = i * (barW + gap);
           const y = cssH - h - 2;
 
-          // Gradiente: azul (graves) → verde (medios) → rojo (agudos), intensidad por nivel
-          const hue = 240 - i * (240 / N); // 240 (azul) → 0 (rojo)
-          const light = 35 + t * 30;
-          ctx.fillStyle = `hsl(${hue},80%,${light}%)`;
+          const brow = 40 - (i / N) * 12;
+          const light = 36 + t * 28;
+          ctx.fillStyle = `hsl(${brow},85%,${light}%)`;
+          ctx.shadowColor = `rgba(231, 177, 90, ${0.18 + t * 0.18})`;
+          ctx.shadowBlur = 6;
           ctx.beginPath();
           ctx.roundRect(x, y, barW, h, 2);
           ctx.fill();
+          ctx.shadowBlur = 0;
         }
 
         // Línea de referencia -18 dBFS
@@ -7521,6 +7549,12 @@
       // ── Preview ──────────────────────────────────────────────────────────────────
       function setPreviewStatus(text) {
         const el = document.getElementById("previewStatus");
+        if (el) el.textContent = text;
+        const panel = document.getElementById("previewPanelStatus");
+        if (panel) panel.textContent = text;
+      }
+      function setPreviewMode(text) {
+        const el = document.getElementById("previewModeBadge");
         if (el) el.textContent = text;
       }
       function renderProfessionalMeter(a) {
@@ -7810,6 +7844,7 @@ self.onmessage = function(e) {
         const wrap = document.getElementById("previewWrap");
         wrap.style.display = "block";
         setPreviewUpdating(true);
+        setPreviewMode("Live stream · 10s");
         setPreviewStatus("Streaming preview + meters en tiempo real…");
 
         try {
@@ -7995,6 +8030,7 @@ self.onmessage = function(e) {
                  <div style="font-size:.7rem;color:var(--muted);margin-top:.2rem">▲ 24-bit WAV · cadena completa · idéntico al master final</div>`;
               const _audioEl = document.querySelector('#previewAudioWrap audio');
               if (_audioEl) startPreviewSpectrum(_audioEl);
+              setPreviewMode("HQ 24-bit WAV");
               setPreviewStatus("Preview listo ✓ · 24-bit · cadena completa");
             } else {
               // Fallback: usar el PCM del WS si /preview falla
@@ -8003,6 +8039,7 @@ self.onmessage = function(e) {
               document.getElementById("previewAudioWrap").innerHTML = `<audio controls src="${previewAudioUrl}"></audio>`;
               const _audioEl2 = document.querySelector('#previewAudioWrap audio');
               if (_audioEl2) startPreviewSpectrum(_audioEl2);
+              setPreviewMode("Fallback preview");
               setPreviewStatus("Preview listo (calidad estándar — /preview no disponible)");
             }
           } catch (hqErr) {
@@ -8013,6 +8050,7 @@ self.onmessage = function(e) {
               document.getElementById("previewAudioWrap").innerHTML = `<audio controls src="${previewAudioUrl}"></audio>`;
               const _audioEl3 = document.querySelector('#previewAudioWrap audio');
               if (_audioEl3) startPreviewSpectrum(_audioEl3);
+            setPreviewMode("Fallback preview");
             setPreviewStatus("Preview listo ✓ · meters actualizados en tiempo real");
           }
           setPreviewUpdating(false);
@@ -8622,8 +8660,8 @@ self.onmessage = function(e) {
             const x = padL + i * barW + 1;
             const y = padT + (1 - t) * plotH;
             const h = plotH - (y - padT);
-            const hue = 240 - (i / N) * 240;
-            ctx.fillStyle = `hsl(${hue},60%,60%)`;
+            const hue = 42 - (i / N) * 16;
+            ctx.fillStyle = `hsl(${hue},78%,${36 + t * 24}%)`;
             ctx.fillRect(x, y, Math.max(1, barW - 2), Math.max(1, h));
           }
         } else {
@@ -9136,6 +9174,14 @@ self.onmessage = function(e) {
         }
       })();
 
+      // ── UX Fix 5: eliminado ───────────────────────────────────────────────────────
+      // (el wrapper anterior nunca se ejecutaba en el click del botón "Enviar" porque
+      // el listener ya tenía capturada la referencia original de aiSendMessage antes
+      // de que este bloque la reemplazara, y además aiSendMessage() ya maneja sus
+      // propios errores con try/catch interno — el wrapper era código muerto)
+    </script>
+  </body>
+</html>
       // ── UX Fix 5: eliminado ───────────────────────────────────────────────────────
       // (el wrapper anterior nunca se ejecutaba en el click del botón "Enviar" porque
       // el listener ya tenía capturada la referencia original de aiSendMessage antes
